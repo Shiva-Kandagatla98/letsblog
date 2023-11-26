@@ -1,8 +1,8 @@
 from project import create_app
 
 
-app = create_app()
+application = create_app()
 
 if __name__ == '__main__':
-    # app.debug = True 
-    app.run()
+    application.debug = True 
+    application.run()
