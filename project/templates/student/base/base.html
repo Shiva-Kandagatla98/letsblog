@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lets Blog - {{title}}</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- jQuery dataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <!-- Font Awsome CSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+      integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Froala Html Editor -->
+    <link href='https://cdn.jsdelivr.net/npm/froala-editor@4.0.10/css/froala_editor.pkgd.min.css' rel='stylesheet'
+      type='text/css' />
+    <!-- Select2 Plugin -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+  </head>
+
+  <body>
+
+    <div class="bg-white">
+      <div class="top-bar container">
+        <div class="logo">
+          <h3 class="fw-bold"><i class="fa-solid fa-blog fs-1"></i> Let's' Blog</h3>
+        </div>
+
+        <div class="login-register d-flex gap-4">
+          {% if not session['logged_in'] %}
+          <div>
+            <i class="fa-solid fa-right-to-bracket me-1 fs-6"></i>
+            <a href="/login" class="fs-6 text-decoration-none text-secondary">Login</a>
+          </div>
+          <div>
+            <i class="fa-solid fa-user me-1 fs-6"></i>
+            <a href="/register" class="fs-6 text-decoration-none text-secondary">Register</a>
+          </div>
+          {% endif %}
+        </div>
+
+
+        <div class="social-icons d-flex">
+          <a href="http://www.facebook.com" class="mx-2">
+            <img width="42" height="42" src="https://img.icons8.com/color/48/facebook-new.png" alt="facebook-new" />
+          </a>
+          <a href="http://www.twitter.com" class="mx-2">
+            <img width="42" height="42" src="https://img.icons8.com/color/48/twitter--v1.png" alt="twitter--v1" />
+          </a>
+          <a href="http://www.instagram.com" class="mx-2">
+            <img width="42" height="42" src="https://img.icons8.com/color/48/instagram-new--v1.png"
+              alt="instagram-new--v1" />
+          </a>
+          <a href="http://www.whatsapp.com" class="mx-2">
+            <img width="42" height="42" src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="whatsapp--v1" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+          <ul class="navbar-nav me-auto mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link {{'active' if curPage=='home'}}" href="/home">
+                <i class="fa fa-house fa-fw fs-6 me-1"></i>
+                <span class="fs-6">Home</span>
+              </a>
+            </li>
+
+            {% if session['logged_in'] and session['user']['role'] == 'student'%}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="roomDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <span>
+                  <i class="fa fa-list-dots fa-fw fs-6 me-1"></i>
+                  Rooms
+                </span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark" id="menu_display_room_list" aria-labelledby="roomDropdown">
+
+              </ul>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link {{'active' if curPage=='myblogs'}}" href="/my-blogs">
+                <i class="fa-brands fa-blogger fa-fw me-1"></i>
+                <span class="fs-6">My Blogs</span>
+              </a>
+            </li>
+            {% endif %}
+
+            <li class="nav-item">
+              <a class="nav-link {{'active' if curPage=='aboutus'}}" href="/about-us/">
+                <i class="fa fa-address-card fa-fw fs-6 me-1"></i>
+                <span class="fs-6">About Us</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{'active' if curPage=='contactus'}}" href="/contact-us/">
+                <i class="fa fa-envelope fa-fw fs-6 me-1"></i>
+                <span class="fs-6">Contact Us</span>
+              </a>
+            </li>
+
+
+
+          </ul>
+          <!-- <form action="/search/" class="d-flex">
+            <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-info" type="submit">Search</button>
+          </form> -->
+
+          {% if session['logged_in'] and session['user']['role'] == 'student'%}
+          <ul class="navbar-nav ms-auto mb-lg-0">
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <span>
+                  <i class="fa fa-gear fa-fw fs-6 me-1"></i>
+                  <span>Hi,{{session['user']['full_name']}}</span>
+                </span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                <li>
+                  <a class="dropdown-item" href="/my-profile">
+                    <i class="fa fa-user fa-fw me-1"></i> My Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/change-password">
+                    <i class="fa fa-lock fa-fw me-1"></i> Change Password
+                  </a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/logout">
+                    <i class="fa-solid fa-right-from-bracket fa-fw me-1"></i> Logout
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+          </ul>
+          {% endif%}
+
+        </div>
+      </div>
+    </nav>
+    <!-- End of Navbar -->
+
+    <!-- Content -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category,message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      <strong><em>{{message}}</em></strong>.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% block content%}
+
+    {% endblock%}
+
+    <!-- End of Content -->
+
+    <footer class="bg-dark text-light">
+      <div class="container py-3">
+        <h6 class="text-center text-light">Copyright &copy; 2023 Lets Blog . All Rights Reserved.</h6>
+      </div>
+    </footer>
+
+    <!-- jQuery CDN  -->
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <!-- Bootstrap bundle js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"></script>
+    <!-- JQuery Datatables -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Froala Html Editor -->
+    <script type='text/javascript'
+      src='https://cdn.jsdelivr.net/npm/froala-editor@latest/js/froala_editor.pkgd.min.js'></script>
+    <!-- Select2 Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- jQuery validation -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js"></script>
+    <script src="{{url_for('static',filename='scripts/validation.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/custom.js')}}"></script>
+    <script>
+
+      $(document).ready(function () {
+
+        // get rooms name for nav dropdown
+        $.get("/ajax-get-room-names/", function (result) {
+          console.log(result);
+          if (result) {
+            toAppend = "";
+            $.each(result, function (key, value) {
+              toAppend += `
+            <li>
+              <a class="dropdown-item" href="/room/blogs/?room_id=${value._id.$oid}">
+                <i class="fa-brands fa-blogger fa-fw me-1"></i> ${value.room_name}
+              </a>
+            </li>
+            `;
+              console.log(value._id.$oid);
+            })
+            $("#menu_display_room_list").append(toAppend);
+          }
+        })
+
+        $('#students').select2();
+
+        $('#table').DataTable({
+          "pageLength": 25,
+          "columnDefs": [{
+            "searchable": false,
+            "targets": 0
+          }]
+        });
+
+      });
+    </script>
+
+    {% block scripts%}
+    {% endblock %}
+  </body>
+
+</html>

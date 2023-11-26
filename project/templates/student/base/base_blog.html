@@ -1,0 +1,69 @@
+{% extends "/student/base/base.html" %}
+
+{% block content %}
+
+{% block banner %}
+
+{% endblock %}
+
+<div class="container">
+  <div class="d-flex mb-5 gap-5">
+
+    {% block main_content%}
+
+    {% endblock %}
+
+    <div class="sub-content w-30">
+
+      <div class="mb-5">
+        <h4 class="text-center page-title bg-white">Filter</h4>
+        <hr>
+        <form action="/search/" class="bg-white border p-3">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" name="title" id="title" class="form-control">
+          </div>
+
+          <input type="submit" class="btn btn-success w-100 mb-2" value="Search">
+          <a href="/search/" class="btn btn-warning w-100">Cancel</a>
+        </form>
+      </div>
+
+      <div>
+        <h4 class="text-center page-title bg-white">Most Read Article</h4>
+        <hr>
+
+        {% for blog in template_datas['most_viewed_blogs'] %}
+        <div class="mb-3">
+          <a href="/view-blog/?bid={{blog['_id']}}" class="text-decoration-none">
+            <div class="blog bg-white p-3">
+              <div class="mb-2">
+                <img src="{{ url_for('static', filename='images/uploads/blogs/'+blog['image_file_name']) }}"
+                  alt="blog image" style="width: 100%; height:180px; object-fit: contain;">
+              </div>
+              <h6 class="mb-3 text-secondary">
+                {{blog['blog_title']}}
+              </h6>
+              <div class="d-flex justify-content-start gap-2 text-secondary">
+                <div class="">
+                  <i class="fa-solid fa-user fa-fw me-1"></i>
+                  {{blog['student'][0]['full_name']}}
+                </div>
+                <div>
+                  <i class="fa-solid fa-clock fa-fw me-1"></i>
+                  {{blog['inserted_date'].strftime("%d %B, %Y")}}
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+{% endblock %}

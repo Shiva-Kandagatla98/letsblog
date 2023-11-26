@@ -1,0 +1,202 @@
+{% set curPage = 'blog_view' %}
+{% set title = 'View Blog' %}
+{% set return_url = request.url %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-4 my-2">
+  <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="javascript:window.history.back()" class=" text-decoration-none">blogs</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">View Blog</li>
+    </ol>
+  </nav>
+
+  <div class="mt-2">
+    <fieldset class="border p-4">
+      <legend class="float-none w-auto fs-5">Blog Details</legend>
+
+      {% if blog['status'] == 0 %}
+      <div class="approve-reject mb-3">
+        <a href="/admin/approve-blog/?bid={{blog['_id']}}" class="btn btn-sm btn-success">Approve</a>
+        <a href="#rejectModal" data-bs-toggle="modal" class="btn btn-sm btn-danger">Reject</a>
+      </div>
+      {% endif %}
+
+      {% if blog['status'] == 2 %}
+      <div class="approve-reject mb-3">
+        <a href="/admin/approve-blog/?bid={{blog['_id']}}" class="btn btn-sm btn-success">Approve</a>
+      </div>
+      {% endif %}
+
+
+      <div>
+        <h1 class="mb-3">{{blog['blog_title']}}</h1>
+        <div class="d-flex gap-3 mb-3">
+          <span>
+            <i class="fa-solid fa-user me-1"></i>
+            {{blog['user'][0]['full_name']}}
+          </span>
+          <span>
+            <i class="fa-solid fa-clock me-1"></i>
+            {{blog['inserted_date'].strftime("%d %B, %Y - %H:%M %p")}}
+          </span>
+        </div>
+
+        <div class="tags mb-3">
+          {% set tags = blog['tags'].split(',')%}
+          {%for tag in tags%}
+          <a href="#" class="btn btn-sm btn-outline-secondary me-2">{{tag}}</a>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <img src="{{ url_for('static', filename='images/uploads/blogs/'+blog['image_file_name']) }}" alt="blog image"
+            style="width: 100%;">
+        </div>
+
+        <div class="d-flex gap-4 mb-3">
+          <button type="button" class="btn btn-sm btn-primary">
+            <span class="d-flex gap-2 align-items-center">
+              <span><i class="fa-solid fa-thumbs-up"></i> Like</span>
+              <span class="badge rounded-pill bg-light text-primary">{{blog['likes']|length}}</span>
+            </span>
+          </button>
+          <button type="button" class="btn btn-sm btn-danger">
+            <span class="d-flex gap-2 align-items-center">
+              <span><i class="fa-solid fa-thumbs-down"></i> Dislike</span>
+              <span class="badge rounded-pill bg-light text-danger">{{blog['dislikes']|length}}</span>
+            </span>
+          </button>
+        </div>
+
+        <div class="content">
+          {{blog['content']|safe}}
+        </div>
+
+      </div>
+
+      <hr>
+
+      <div class="comments">
+        <h3>Comments</h3>
+        <div class="border p-2">
+          {% if not blog['comments'] %}
+          <h5 class="text-danger">Sorry!, No comments yet</h5>
+          {% endif %}
+          <div class="comments mt-3">
+            {% for comment in blog['comments']|sort(attribute='_id', reverse=True) %}
+            {% set student = getStudentById(comment['student_id'])%}
+            <div class="border px-3 py-1 mb-2">
+              <div class="d-flex justify-content-between text-secondary mb-2">
+                <span>{{student['full_name']}}</span>
+                <span> {{comment['comment_date'].strftime("%d %B, %Y - %H:%M %p")}} </span>
+              </div>
+
+              <div class="mb-2 comment">
+                <q>
+                  {{comment['comment']}}
+                </q>
+                <div class="delete-comment my-2">
+                  <button title="Delete this comment"
+                    onclick="return confirm('Are you sure to delete this comment?') ? deleteComment(`{{blog['_id']}}`, `{{comment['_id']}}`) : ''"
+                    class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+
+
+              <div class="post_reply mt-1">
+                <div class="replies mt-2">
+                  {% for reply in comment['replies']|sort(attribute='_id', reverse=True) %}
+                  {% set student = getStudentById(reply['student_id'])%}
+                  <div class="border ms-5 py-1 px-3 mb-2">
+                    <div class="d-flex justify-content-between text-secondary mb-2">
+                      <span>{{student['full_name']}}</span>
+                      <span> {{reply['reply_date'].strftime("%d %B, %Y - %H:%M %p")}} </span>
+                    </div>
+
+                    <div class="mb-2 reply">
+                      <q>
+                        {{reply['reply']}}
+                      </q>
+                      <div class="delete-comment my-2">
+                        <button title="Delete this comment"
+                          onclick="return confirm('Are you sure to delete this comment?') ? deleteComment(`{{blog['_id']}}`, `{{comment['_id']}}`, `{{reply['_id']}}`) : ''"
+                          class="btn btn-sm btn-danger">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                  {% endfor %}
+                </div>
+
+              </div>
+
+            </div>
+            {% endfor %}
+          </div>
+
+        </div>
+      </div>
+
+
+    </fieldset>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectModalLabel">Reject Blog</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/admin/reject-blog/">
+          <div class="mb-3">
+            <label for="remarks" class="form-label">Remarks</label>
+            <input type="hidden" name="blog_id" value="{{blog['_id']}}">
+            <textarea name="remarks" id="remarks" class="form-control" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-danger">Reject</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+  function deleteComment(blog_id, comment_id, reply_id) {
+    $.get('/admin/delete-comment/',
+      {
+        blog_id: blog_id,
+        comment_id: comment_id,
+        reply_id: reply_id
+      },
+      function (result) {
+        if (result) {
+          window.location.reload();
+        }
+      })
+  }
+</script>
+
+{% endblock %}

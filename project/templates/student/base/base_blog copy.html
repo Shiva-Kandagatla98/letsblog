@@ -1,0 +1,108 @@
+{% extends "/student/base/base.html" %}
+
+{% block content %}
+
+{% block banner %}
+
+{% endblock %}
+
+<div class="container">
+  <div class="d-flex mb-5 gap-5">
+
+    {% block main_content%}
+
+    {% endblock %}
+
+    <div class="sub-content w-30">
+
+      <div class="mb-5">
+        <h4 class="text-center page-title bg-white">Filter</h4>
+        <hr>
+        <form action="/search/" class="bg-white border p-3">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" name="title" id="title" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label for="room" class="form-label">Room</label>
+            <select class="form-select" name="room" id="room">
+              <option value="">--Select--</option>
+              {% for room1 in template_datas['rooms']%}
+              <option value="{{room1['_id']}}" {{'selected' if
+                request.args.get('room')==template_datas['str'](room1['_id'])}}>
+                {{room1['room_name']}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="" class="form-label">Student</label>
+            <select class="form-select" name="student" id="student">
+              <option value="">--Select--</option>
+              {% for student in template_datas['students']%}
+              <option value="{{student['_id']}}" {{'selected' if
+                request.args.get('student')==template_datas['str'](student['_id'])}}>{{student['full_name']}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <input type="submit" class="btn btn-success w-100 mb-2" value="Search">
+          <a href="/search/" class="btn btn-warning w-100">Cancel</a>
+        </form>
+      </div>
+
+      <div class="mb-5">
+        <h4 class="text-center page-title bg-white">Rooms</h4>
+        <hr>
+        <div class="list-group">
+          {% for room in template_datas['roomswithcount'] %}
+          <a href="/room/blogs/?room_id={{room['_id']}}"
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            aria-current="true">
+            <span>{{room['room_name']}}</span>
+            <span class="badge bg-primary rounded-pill">{{room['blog_count']}}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-center page-title bg-white">Most Read Article</h4>
+        <hr>
+
+        {% for blog in template_datas['most_viewed_blogs'] %}
+        <div class="mb-3">
+          <a href="/view-blog/?bid={{blog['_id']}}" class="text-decoration-none">
+            <div class="blog bg-white p-3">
+              <div class="mb-2">
+                <img src="{{ url_for('static', filename='images/uploads/blogs/'+blog['image_file_name']) }}"
+                  alt="blog image" style="width: 100%; height:180px; object-fit: contain;">
+              </div>
+              <h6 class="mb-3 text-secondary">
+                {{blog['blog_title']}}
+              </h6>
+              <div class="d-flex justify-content-start gap-2 text-secondary">
+                <div class="">
+                  <i class="fa-solid fa-user fa-fw me-1"></i>
+                  {{blog['student'][0]['full_name']}}
+                </div>
+                <div>
+                  <i class="fa-solid fa-clock fa-fw me-1"></i>
+                  {{blog['inserted_date'].strftime("%d %B, %Y")}}
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+{% endblock %}

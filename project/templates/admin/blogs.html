@@ -1,0 +1,70 @@
+{% set curPage = 'blogs' %}
+{% set title = 'Blogs' %}
+{% set user = request.args.get('user') %}
+{% set rejected = request.args.get('rejected') %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-2 my-2">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Blogs</li>
+    </ol>
+  </nav>
+
+  <a href="/admin/view-rejected-blogs/" class="btn btn-danger btn-sm"> View rejected blogs</a>
+
+  <div class="table-responsive my-4">
+    <table class="table table-bordered" id="table">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Room</th>
+          <th>Author</th>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Visit Count</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for blog in blogs %}
+        <tr class="{{'text-danger' if blog['status'] == BlogStatus.REJECTED.value}}">
+          <td>{{loop.index}}</td>
+          <td>{{blog['rooms'][0]['room_name']}}</td>
+          <td>{{blog['students'][0]['full_name']}}</td>
+          <td>{{blog['blog_title']}}</td>
+          <td>
+            <div class="d-flex gap-2">
+              <span>{{BlogStatus(blog['status']).name}}</span>
+              {% if blog['is_featured'] %}
+              <span><i class="fa-solid fa-star text-warning" title="featured"></i></span>
+              {% endif %}
+            </div>
+          </td>
+          <td>{{blog['visit_count']}}</td>
+          <td>
+            <a href="/admin/view-blog/?bid={{blog['_id']}}" class="btn btn-info btn-sm" title="view blog">
+              <i class="fas fa-eye"></i>
+            </a>
+            <a href="/admin/delete-blog/?blog_id={{blog['_id']}}" class="btn btn-danger btn-sm" title="delete blog"
+              onclick="return confirm('Are you sure to delete this blog?')">
+              <i class="fas fa-trash-alt"></i>
+            </a>
+            <a href="/admin/set-featured-blog/?bid={{blog['_id']}}" class="btn btn-warning btn-sm"
+              title="set or unset featured blog">
+              <i class="fa-solid fa-star "></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}
