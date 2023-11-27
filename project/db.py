@@ -2,8 +2,12 @@ from bson import ObjectId
 import pymongo
 
 
-dbClient = pymongo.MongoClient('mongodb+srv://sxk52450:sxk52450@shiva-s-cluster.iwhzjb6.mongodb.net/')
-db = dbClient["blog"]
+dbClient = pymongo.MongoClient('mongodb+srv://sxk52450:sxk52450@shiva-s-cluster.iwhzjb6.mongodb.net/?retryWrites=true&w=majority')
+try:
+    db = dbClient["blog"]
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 
 admin = db['admin']
 sub_admins = db['sub_admins']
